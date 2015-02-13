@@ -14,13 +14,29 @@ extern NSString * const kTiMediaAudioSessionRouteChange;
 extern NSString * const kTiMediaAudioSessionVolumeChange;
 extern NSString * const kTiMediaAudioSessionInputChange;
 
+typedef enum
+{
+	TiMediaAudioSessionInputHeadsetInOut,
+	TiMediaAudioSessionInputReceiverAndMicrophone,
+	TiMediaAudioSessionInputHeadphonesAndMicrophone,
+	TiMediaAudioSessionInputLineOut,
+	TiMediaAudioSessionInputSpeaker,
+	TiMediaAudioSessionInputHeadphones,
+	TiMediaAudioSessionInputMicrophoneBuiltin,
+	TiMediaAudioSessionInputMuted,
+	TiMediaAudioSessionInputUnavailable,
+	TiMediaAudioSessionInputUnknown
+}
+TiMediaAudioSessionInputType;
+
+
 @interface TiMediaAudioSession : NSObject {
 @private
 	NSInteger count;
 	NSLock *lock;
 }
 
-@property (readwrite, assign) NSString* sessionMode;
+@property (readwrite, assign) UInt32 sessionMode;
 
 +(TiMediaAudioSession*)sharedSession;
 
@@ -29,12 +45,11 @@ extern NSString * const kTiMediaAudioSessionInputChange;
 -(BOOL)canRecord;
 -(BOOL)canPlayback;
 -(BOOL)isActive;
--(NSDictionary*)currentRoute;
+-(TiMediaAudioSessionInputType)inputType;
 -(CGFloat)volume;
 -(BOOL)isAudioPlaying;
 -(BOOL)hasInput;
 -(void)setRouteOverride:(UInt32)mode;
-
 @end
 
 #endif

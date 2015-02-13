@@ -77,7 +77,7 @@
 
 -(NSString*)description
 {
-	return [NSString stringWithFormat:@"KrollTimer<%lu>",(unsigned long)[self hash]];
+	return [NSString stringWithFormat:@"KrollTimer<%d>",[self hash]];
 }
 
 -(void)main

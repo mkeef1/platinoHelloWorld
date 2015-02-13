@@ -23,7 +23,8 @@
 	TiUITabGroupProxy *tabGroup;
     
 	NSMutableArray* controllerStack;
-	
+    
+	BOOL opening;
 	BOOL systemTab;
 	BOOL transitionIsAnimating;
 	BOOL transitionWithGesture;

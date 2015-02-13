@@ -38,11 +38,7 @@ NSString* const DATA_IFACE = @"pdp_ip0";
 		version = [[theDevice systemVersion] retain];
 		processorCount = [[NSNumber numberWithInt:1] retain];
 		username = [[theDevice name] retain];
-#ifdef __LP64__
-		ostype = [@"64bit" retain];
-#else
 		ostype = [@"32bit" retain];
-#endif
 		
 		if ([TiUtils isIPad])
 		{
@@ -60,6 +56,8 @@ NSString* const DATA_IFACE = @"pdp_ip0";
 		// attempt to determine extended phone info
 		struct utsname u;
 		uname(&u);
+		
+		NSString *arch = @"arm";
 		
 		// detect iPhone 3G model
 		if (!strcmp(u.machine, "iPhone1,2")) 
@@ -90,17 +88,19 @@ NSString* const DATA_IFACE = @"pdp_ip0";
 		else if (!strcmp(u.machine, "i386")) 
 		{
 			model = [@"Simulator" retain];
+			arch = @"i386";
 		}
 		// detect simulator for x86_64
 		else if (!strcmp(u.machine, "x86_64")) 
 		{
 			model = [@"Simulator" retain];
+			arch = @"x86_64";
 		}
 		else 
 		{
 			model = [[NSString alloc] initWithUTF8String:u.machine];
 		}
-		architecture = [[TiUtils currentArchitecture] retain];
+		architecture = [arch retain];
 
 		// needed for platform displayCaps orientation to be correct
 		[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -229,7 +229,7 @@ NSString* const DATA_IFACE = @"pdp_ip0";
 {
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setLocale:[NSLocale currentLocale]];
-	[dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+	[dateFormatter setTimeStyle:kCFDateFormatterShortStyle];
 	NSString *dateInStringForm = [dateFormatter stringFromDate:[NSDate date]];
 	NSRange amRange = [dateInStringForm rangeOfString:[dateFormatter AMSymbol]];
 	NSRange pmRange = [dateInStringForm rangeOfString:[dateFormatter PMSymbol]];

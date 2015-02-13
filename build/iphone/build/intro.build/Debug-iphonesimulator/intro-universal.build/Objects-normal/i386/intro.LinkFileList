@@ -146,6 +146,10 @@
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/XMLModule.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIiPhoneTableViewScrollPositionProxy.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiMediaAudioRecorderProxy.o
+/Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/CADebugMacros.o
+/Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/CAStreamBasicDescription.o
+/Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/CAXException.o
+/Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/AQRecorder.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/SCListener.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiMediaAudioSession.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIPickerProxy.o
@@ -169,6 +173,7 @@
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiMediaVideoPlayer.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIiPadSplitWindowProxy.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIiPadPopoverProxy.o
+/Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIiPadPopover.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIiPadProxy.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/TiUIiPadSplitWindowButtonProxy.o
 /Users/matt/Documents/Code/Titanium/intro/build/iphone/build/intro.build/Debug-iphonesimulator/intro-universal.build/Objects-normal/i386/LauncherButton.o

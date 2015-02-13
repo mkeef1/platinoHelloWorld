@@ -239,8 +239,15 @@
     int theStyle = [TiUtils intValue:[self valueForUndefinedKey:@"statusBarStyle"] def:[[[TiApp app] controller] defaultStatusBarStyle]];
     switch (theStyle){
         case UIStatusBarStyleDefault:
-        case UIStatusBarStyleLightContent:
-            barStyle = theStyle;
+            barStyle = UIStatusBarStyleDefault;
+            break;
+        case UIStatusBarStyleBlackOpaque:
+        case UIStatusBarStyleBlackTranslucent: //This will also catch UIStatusBarStyleLightContent
+            if ([TiUtils isIOS7OrGreater]) {
+                barStyle = 1;//UIStatusBarStyleLightContent;
+            } else {
+                barStyle = theStyle;
+            }
             break;
         default:
             barStyle = UIStatusBarStyleDefault;
@@ -267,8 +274,15 @@
     int theStyle = [TiUtils intValue:style def:[[[TiApp app] controller] defaultStatusBarStyle]];
     switch (theStyle){
         case UIStatusBarStyleDefault:
-        case UIStatusBarStyleLightContent:
-            barStyle = theStyle;
+            barStyle = UIStatusBarStyleDefault;
+            break;
+        case UIStatusBarStyleBlackOpaque:
+        case UIStatusBarStyleBlackTranslucent: //This will also catch UIStatusBarStyleLightContent
+            if ([TiUtils isIOS7OrGreater]) {
+                barStyle = 1;//UIStatusBarStyleLightContent;
+            } else {
+                barStyle = theStyle;
+            }
             break;
         default:
             barStyle = UIStatusBarStyleDefault;

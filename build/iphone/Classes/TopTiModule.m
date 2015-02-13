@@ -21,17 +21,17 @@
 
 -(id)version
 {
-	return @"3.5.0";
+	return @"3.4.1";
 }
 
 -(id)buildDate
 {
-	return @"01/12/15 15:33";
+	return @"11/13/14 13:33";
 }
 
 -(id)buildHash
 {
-	return @"0014f83";
+	return @"5982e8f";
 }
 
 +(BOOL)shouldRegisterOnInit
@@ -95,7 +95,7 @@
     BOOL hasLength;
     id data;
     NSString* type;
-    CFByteOrder byteOrder;
+    int byteOrder;
     BOOL hasByteOrder;
     
     ENSURE_INT_OR_NIL_FOR_KEY(length, arg, @"length", hasLength);
@@ -111,7 +111,7 @@
     // NOTE: We use the length of the buffer as a hint when encoding strings.  In this case, if [string length] > length,
     // we only encode up to 'length' of the string.
     if ([data isKindOfClass:[NSString class]]) {
-        NSUInteger encodeLength = (hasLength) ? length : [data length];
+        int encodeLength = (hasLength) ? length : [data length];
 
         NSString* charset = (type != nil) ? type : kTiUTF8Encoding;
         
@@ -149,10 +149,10 @@
         }
         
         byteOrder = (hasByteOrder) ? byteOrder : CFByteOrderGetCurrent();
-        [buffer setByteOrder:NUMLONG(byteOrder)];
+        [buffer setByteOrder:[NSNumber numberWithInt:byteOrder]];
         switch ([TiUtils encodeNumber:data toBuffer:buffer offset:0 type:type endianness:byteOrder]) {
             case BAD_ENDIAN: {
-                [self throwException:[NSString stringWithFormat:@"Invalid endianness: %ld", byteOrder]
+                [self throwException:[NSString stringWithFormat:@"Invalid endianness: %d", byteOrder]
                            subreason:nil
                             location:CODELOCATION];
                 break;

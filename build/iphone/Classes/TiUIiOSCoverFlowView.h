@@ -20,7 +20,7 @@
 	NSMutableDictionary* toLoad;
 	NSMutableDictionary* loading;
 	NSRecursiveLock* loadLock;
-	NSInteger previous;
+	int previous;
 }
 
 -(void)setImage:(id)image forIndex:(NSInteger)index;

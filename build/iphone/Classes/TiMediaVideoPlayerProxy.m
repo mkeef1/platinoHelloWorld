@@ -472,32 +472,41 @@ NSArray* moviePlayerKeys = nil;
 
 -(NSNumber*)useApplicationAudioSession
 {
-    DebugLog(@"[WARN] Deprecated property useApplicationAudioSession; Setting this property has no effect'");
-    return NUMBOOL(YES);
+	if (movie != nil) {
+		return NUMBOOL([movie useApplicationAudioSession]);
+	}
+	else {
+		RETURN_FROM_LOAD_PROPERTIES(@"useApplicationAudioSession",NUMBOOL(YES));
+	}
 }
 
 -(void)setUseApplicationAudioSession:(id)value
 {
-    DebugLog(@"[WARN] Deprecated property useApplicationAudioSession; Setting this property has no effect'");
+	if (movie != nil) {
+		[movie setUseApplicationAudioSession:[TiUtils boolValue:value]];
+	}
+	else {
+		[loadProperties setValue:value forKey:@"useApplicationAudioSession"];
+	}
 }
 
 -(NSNumber *)volume
 {
-	__block float volume = 1.0;
+	__block double volume = 1.0;
 	TiThreadPerformOnMainThread(^{
-        volume = [TiUtils volumeFromObject:[MPMusicPlayerController applicationMusicPlayer] default:1.0];
+		volume = (double)[[MPMusicPlayerController applicationMusicPlayer] volume];
 	}, YES);
 	
-	return NUMFLOAT(volume);
+	return NUMDOUBLE(volume);
 }
 
 -(void)setVolume:(NSNumber *)newVolume
 {
-	float volume = [TiUtils floatValue:newVolume def:-1.0];
+	double volume = [TiUtils doubleValue:newVolume def:-1.0];
     volume = MAX(0.0, MIN(volume, 1.0));
 	TiThreadPerformOnMainThread(^{
-        [TiUtils setVolume:volume onObject:[MPMusicPlayerController applicationMusicPlayer]];
-	}, YES);
+		[[MPMusicPlayerController applicationMusicPlayer] setVolume:volume];
+	}, NO);
 }
 
 -(void)cancelAllThumbnailImageRequests:(id)value
@@ -528,8 +537,14 @@ NSArray* moviePlayerKeys = nil;
 
 -(TiBlob*)thumbnailImageAtTime:(id)args
 {
-    DEPRECATED_REPLACED_REMOVED(@"Media.VideoPlayer.thumbnailImageAtTime",@"3.4.2",@"3.6.0",@"Media.VideoPlayer.requestThumbnailImagesAtTimes")
-    return nil;
+	NSNumber *time = [args objectAtIndex:0];
+	NSNumber *options = [args objectAtIndex:1];
+	TiBlob *blob = [[[TiBlob alloc] init] autorelease];
+	TiThreadPerformOnMainThread(^{
+		UIImage *image = [movie thumbnailImageAtTime:[time doubleValue] timeOption:[options intValue]];
+		[blob setImage:image];
+	}, YES);
+	return blob;
 }
 
 -(void)setBackgroundColor:(id)color
@@ -1052,8 +1067,6 @@ NSArray* moviePlayerKeys = nil;
 		case MPMoviePlaybackStatePlaying:
 			playing = YES;
 			break;
-        default:
-            break;
 	}
 }
 

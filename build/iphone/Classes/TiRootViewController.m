@@ -151,8 +151,10 @@
     if (!IS_NULL_OR_NIL(theString)) {
         if ([theString isEqualToString:@"UIStatusBarStyleDefault"]) {
             return UIStatusBarStyleDefault;
-        } else if ([theString isEqualToString:@"UIStatusBarStyleBlackTranslucent"] || [theString isEqualToString:@"UIStatusBarStyleLightContent"] || [theString isEqualToString:@"UIStatusBarStyleBlackOpaque"]) {
-            return UIStatusBarStyleLightContent;
+        } else if ([theString isEqualToString:@"UIStatusBarStyleBlackOpaque"]) {
+            return [TiUtils isIOS7OrGreater] ? 1 : UIStatusBarStyleBlackOpaque;
+        } else if ([theString isEqualToString:@"UIStatusBarStyleBlackTranslucent"] || [theString isEqualToString:@"UIStatusBarStyleLightContent"]) {
+            return [TiUtils isIOS7OrGreater] ? 1 : UIStatusBarStyleBlackTranslucent;
         }
     }
     return UIStatusBarStyleDefault;
@@ -854,27 +856,10 @@
 
 -(void)showControllerModal:(UIViewController*)theController animated:(BOOL)animated
 {
-    BOOL trulyAnimated = animated;
     UIViewController* topVC = [self topPresentedController];
-    
-    if ([topVC isBeingDismissed]) {
-        topVC = [topVC presentingViewController];
-    }
-    
     if ([topVC isKindOfClass:[TiErrorController class]]) {
         DebugLog(@"[ERROR] ErrorController is up. ABORTING showing of modal controller");
         return;
-    }
-    if ([TiUtils isIOS8OrGreater]) {
-        if ([topVC isKindOfClass:[UIAlertController class]]) {
-            if (((UIAlertController*)topVC).preferredStyle == UIAlertControllerStyleAlert ) {
-                trulyAnimated = NO;
-                if (![theController isKindOfClass:[TiErrorController class]]) {
-                    DebugLog(@"[ERROR] UIAlertController is up and showing an alert. ABORTING showing of modal controller");
-                    return;
-                }
-            }
-        }
     }
     if (topVC == self) {
         [[containedWindows lastObject] resignFocus];
@@ -885,7 +870,7 @@
         }
     }
     [self dismissKeyboard];
-    [topVC presentViewController:theController animated:trulyAnimated completion:nil];
+    [topVC presentViewController:theController animated:animated completion:nil];
 }
 
 -(void)hideControllerModal:(UIViewController*)theController animated:(BOOL)animated
@@ -894,17 +879,8 @@
     if (topVC != theController) {
         DebugLog(@"[WARN] Dismissing a view controller when it is not the top presented view controller. Will probably crash now.");
     }
-    BOOL trulyAnimated = animated;
     UIViewController* presenter = [theController presentingViewController];
-    
-    if ([TiUtils isIOS8OrGreater]) {
-        if ([presenter isKindOfClass:[UIAlertController class]]) {
-            if (((UIAlertController*)presenter).preferredStyle == UIAlertControllerStyleAlert ) {
-                trulyAnimated = NO;
-            }
-        }
-    }
-    [presenter dismissViewControllerAnimated:trulyAnimated completion:^{
+    [presenter dismissViewControllerAnimated:animated completion:^{
         if (presenter == self) {
             [self didCloseWindow:nil];
         } else {
@@ -914,14 +890,6 @@
                 id theProxy = [(id)presenter proxy];
                 if ([theProxy conformsToProtocol:@protocol(TiWindowProtocol)]) {
                     [(id<TiWindowProtocol>)theProxy gainFocus];
-                }
-            } else if ([TiUtils isIOS8OrGreater]){
-                //This code block will only execute when errorController is presented on top of an alert
-                if ([presenter isKindOfClass:[UIAlertController class]] && (((UIAlertController*)presenter).preferredStyle == UIAlertControllerStyleAlert)) {
-                    UIViewController* alertPresenter = [presenter presentingViewController];
-                    [alertPresenter dismissViewControllerAnimated:NO completion:^{
-                        [alertPresenter presentViewController:presenter animated:NO completion:nil];
-                    }];
                 }
             }
         }
@@ -976,8 +944,6 @@
         presentedViewController = [topmostController presentedViewController];
         if ( (presentedViewController != nil) && checkPopover && [TiUtils isIOS8OrGreater]) {
             if (presentedViewController.modalPresentationStyle == UIModalPresentationPopover) {
-                presentedViewController = nil;
-            } else if ([presentedViewController isKindOfClass:[UIAlertController class]]) {
                 presentedViewController = nil;
             }
         }
@@ -1041,19 +1007,18 @@
     */
 }
 
--(UIInterfaceOrientation) lastValidOrientation:(TiOrientationFlags)orientationFlags
+-(UIInterfaceOrientation) lastValidOrientation:(BOOL)checkModal
 {
-    if (TI_ORIENTATION_ALLOWED(orientationFlags,deviceOrientation)) {
+    if ([self shouldRotateToInterfaceOrientation:deviceOrientation checkModal:checkModal]) {
         return deviceOrientation;
     }
     for (int i = 0; i<4; i++) {
-        if (TI_ORIENTATION_ALLOWED(orientationFlags,orientationHistory[i])) {
-            return orientationHistory[i];
-        }
-    }
-    
-    //This line should never happen, but just in case...
-    return UIInterfaceOrientationPortrait;
+		if ([self shouldRotateToInterfaceOrientation:orientationHistory[i] checkModal:checkModal]) {
+			return orientationHistory[i];
+		}
+	}
+	//This line should never happen, but just in case...
+	return UIInterfaceOrientationPortrait;
 }
 
 - (BOOL)shouldRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation checkModal:(BOOL)check
@@ -1165,30 +1130,11 @@
 
 -(void)incrementActiveAlertControllerCount
 {
-    if ([TiUtils isIOS8OrGreater]){
-        ++activeAlertControllerCount;
-    }
+    ++activeAlertControllerCount;
 }
 -(void)decrementActiveAlertControllerCount
 {
-    if ([TiUtils isIOS8OrGreater]) {
-        --activeAlertControllerCount;
-        if (activeAlertControllerCount == 0) {
-            UIViewController* topVC = [self topPresentedController];
-            if (topVC == self) {
-                [self didCloseWindow:nil];
-            } else {
-                [self dismissKeyboard];
-                
-                if ([topVC respondsToSelector:@selector(proxy)]) {
-                    id theProxy = [(id)topVC proxy];
-                    if ([theProxy conformsToProtocol:@protocol(TiWindowProtocol)]) {
-                        [(id<TiWindowProtocol>)theProxy gainFocus];
-                    }
-                }
-            }
-        }
-    }
+    --activeAlertControllerCount;
 }
 
 -(NSUInteger)supportedOrientationsForAppDelegate;
@@ -1231,7 +1177,7 @@
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    return [self lastValidOrientation:[self getFlags:NO]];
+    return [self lastValidOrientation:YES];
 }
 
 -(void)didOrientNotify:(NSNotification *)notification
@@ -1242,6 +1188,7 @@
         return;
     }
     deviceOrientation = (UIInterfaceOrientation) newOrientation;
+   
     if ([self shouldRotateToInterfaceOrientation:deviceOrientation checkModal:NO]) {
         [self resetTransformAndForceLayout:YES];
         [self updateOrientationHistory:deviceOrientation];
@@ -1260,7 +1207,7 @@
         return;
     }
     
-    UIInterfaceOrientation target = [self lastValidOrientation:[self getFlags:NO]];
+    UIInterfaceOrientation target = [self lastValidOrientation:NO];
     //Device Orientation takes precedence.
     if (target != deviceOrientation) {
         if ([self shouldRotateToInterfaceOrientation:deviceOrientation checkModal:NO]) {
@@ -1586,7 +1533,7 @@
         for (id<TiWindowProtocol> thisWindow in containedWindows) {
             [thisWindow viewDidAppear:animated];
         }
-        if (forcingRotation || [TiUtils isIOS8OrGreater]) {
+        if (forcingRotation) {
             forcingRotation = NO;
             [self performSelector:@selector(childOrientationControllerChangedFlags:) withObject:[containedWindows lastObject] afterDelay:[[UIApplication sharedApplication] statusBarOrientationAnimationDuration]];
         } else {

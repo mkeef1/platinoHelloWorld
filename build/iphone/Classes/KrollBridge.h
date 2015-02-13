@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Bridge.h"
-#import "JavaScriptCore/Ti.h"
+#import "Ti.h"
 #import "TiEvaluator.h"
 #import "TiProxy.h"
 #import "KrollContext.h"

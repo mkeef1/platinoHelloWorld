@@ -17,6 +17,7 @@
 -(void)startup
 {
 	// enable multi-threading
+	sqlite3_enable_shared_cache(TRUE);
 }
 
 -(NSString*)apiName

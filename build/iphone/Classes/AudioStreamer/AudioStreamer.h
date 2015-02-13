@@ -113,7 +113,7 @@ extern NSString * const ASStatusChangedNotification;
 @property (readwrite) UInt32 bitRate;
 @property (readwrite) double volume;
 @property (readwrite,assign) id<AudioStreamerDelegate> delegate;
-@property (nonatomic,readwrite,assign) UInt32 bufferSize;
+@property (nonatomic,readwrite,assign) NSUInteger bufferSize;
 
 - (void)start;
 - (void)stop;

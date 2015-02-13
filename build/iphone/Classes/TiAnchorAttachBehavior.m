@@ -68,7 +68,9 @@
 
 -(void)updatePositioning
 {
+    CGSize size = [[_item view] bounds].size;
     CGPoint center = [[_item view] center];
+    CGPoint anchor = [[[_item view] layer] anchorPoint];
     
     LayoutConstraint* constraint = [_item layoutProperties];
     constraint->centerX = TiDimensionDip(center.x);

@@ -55,11 +55,11 @@
 	self.frame = CGRectMake(0, 0, newImage.size.width, newImage.size.height);
 }
 
-- (NSInteger)number {
+- (int)number {
 	return number;
 }
 
-- (void)setNumber:(NSInteger)newNumber {
+- (void)setNumber:(int)newNumber {
 	horizontalPosition = COVER_SPACING * newNumber;
 	number = newNumber;
 }

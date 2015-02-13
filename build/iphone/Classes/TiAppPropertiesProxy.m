@@ -90,7 +90,7 @@ if (![self propertyExists:key]) return defaultValue; \
 -(id)getInt:(id)args
 {
 	GETPROP
-	return NUMINTEGER([defaultsObject integerForKey:key]);
+	return [NSNumber numberWithInt:[defaultsObject integerForKey:key]];
 }
 
 -(id)getString:(id)args

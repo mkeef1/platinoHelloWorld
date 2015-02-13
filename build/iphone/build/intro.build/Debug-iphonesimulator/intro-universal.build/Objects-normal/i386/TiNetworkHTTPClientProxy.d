@@ -12,13 +12,12 @@ dependencies: \
   /Users/matt/Documents/Code/Titanium/intro/build/iphone/Classes/TiPublicAPI.h \
   /Users/matt/Documents/Code/Titanium/intro/build/iphone/Classes/TiEvaluator.h \
   /Users/matt/Documents/Code/Titanium/intro/build/iphone/Classes/KrollContext.h \
-  headers/JavaScriptCore/TiCore.h headers/JavaScriptCore/Ti.h \
-  headers/JavaScriptCore/TiBase.h headers/JavaScriptCore/TiContextRef.h \
-  headers/JavaScriptCore/TiObjectRef.h \
-  headers/JavaScriptCore/TiValueRef.h \
-  headers/JavaScriptCore/WebKitAvailability.h \
-  headers/JavaScriptCore/TiStringRef.h \
-  headers/JavaScriptCore/TiStringRefCF.h \
+  /Users/matt/Documents/Code/Titanium/intro/build/iphone/headers/TiCore/TiCore.h \
+  headers/TiCore/Ti.h headers/TiCore/TiBase.h \
+  headers/TiCore/TiContextRef.h headers/TiCore/TiObjectRef.h \
+  headers/TiCore/TiValueRef.h headers/TiCore/WebKitAvailability.h \
+  headers/TiCore/TiStringRef.h headers/TiCore/TiStringRefCF.h \
+  /Users/matt/Documents/Code/Titanium/intro/build/iphone/headers/TiCore/TiContextRefPrivate.h \
   /Users/matt/Documents/Code/Titanium/intro/build/iphone/Classes/KrollCallback.h \
   /Users/matt/Documents/Code/Titanium/intro/build/iphone/Classes/KrollObject.h \
   /Users/matt/Documents/Code/Titanium/intro/build/iphone/Classes/TiBindingRunLoop.h \

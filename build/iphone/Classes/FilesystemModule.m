@@ -77,7 +77,7 @@ extern NSString * TI_APPLICATION_RESOURCE_DIR;
 }
 
 -(id)openStream:(id) args {
-	NSNumber *fileMode = nil;
+	NSNumber *fileMode;
 	
 	ENSURE_ARG_AT_INDEX(fileMode, args, 0, NSNumber);
 	ENSURE_VALUE_RANGE([fileMode intValue], TI_READ, TI_APPEND);
@@ -119,36 +119,36 @@ extern NSString * TI_APPLICATION_RESOURCE_DIR;
 	return NUMBOOL(NO);
 }
 
-#define fileURLify(foo)	[[NSURL fileURLWithPath:foo isDirectory:YES] path]
+#define fileURLify(foo)	[[NSURL fileURLWithPath:foo isDirectory:YES] absoluteString]
 
 -(NSString*)resourcesDirectory
 {
-    return [NSString stringWithFormat:@"%@/",fileURLify([TiHost resourcePath])];
+	return fileURLify([TiHost resourcePath]);
 }
 
 -(NSString*)applicationDirectory
 {
-    return [NSString stringWithFormat:@"%@/",fileURLify([NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSUserDomainMask, YES) objectAtIndex:0])];
+	return fileURLify([NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSUserDomainMask, YES) objectAtIndex:0]);
 }
 
 -(NSString*)applicationSupportDirectory
 {
-    return [NSString stringWithFormat:@"%@/",fileURLify([NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex:0])];
+	return fileURLify([NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex:0]);
 }
 
 -(NSString*)applicationDataDirectory
 {
-    return [NSString stringWithFormat:@"%@/",fileURLify([NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0])];
+	return fileURLify([NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]);
 }
 
 -(NSString*)applicationCacheDirectory
 {
-    return [NSString stringWithFormat:@"%@/",fileURLify([NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0])];
+    return fileURLify([NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]);
 }
 
 -(NSString*)tempDirectory
 {
-    return [NSString stringWithFormat:@"%@/",fileURLify(NSTemporaryDirectory())];
+	return fileURLify(NSTemporaryDirectory());
 }
 
 -(NSString*)separator

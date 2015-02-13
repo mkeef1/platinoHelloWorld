@@ -152,7 +152,6 @@
 
 -(BOOL)resignFirstResponder
 {
-	[super resignFirstResponder];
 	return [[self textWidgetView] resignFirstResponder];
 }
 
@@ -187,11 +186,11 @@
 {
 	TiUITextWidgetProxy * ourProxy = (TiUITextWidgetProxy *)[self proxy];
 
-	[[TiApp controller] didKeyboardFocusOnProxy:(TiViewProxy<TiKeyboardFocusableView> *)ourProxy];
-
 	if ([ourProxy suppressFocusEvents]) {
 		return;
 	}
+
+	[[TiApp controller] didKeyboardFocusOnProxy:(TiViewProxy<TiKeyboardFocusableView> *)ourProxy];
 
 	if ([ourProxy _hasListeners:@"focus"])
 	{
@@ -203,12 +202,12 @@
 {
 	TiUITextWidgetProxy * ourProxy = (TiUITextWidgetProxy *)[self proxy];
 
-	[[TiApp controller] didKeyboardBlurOnProxy:(TiViewProxy<TiKeyboardFocusableView> *)ourProxy];
-
 	if ([ourProxy suppressFocusEvents]) {
 		return;
 	}
-	
+
+	[[TiApp controller] didKeyboardBlurOnProxy:(TiViewProxy<TiKeyboardFocusableView> *)ourProxy];
+
 	if ([ourProxy _hasListeners:@"blur"])
 	{
 		[ourProxy fireEvent:@"blur" withObject:[NSDictionary dictionaryWithObject:value forKey:@"value"] propagate:NO];
@@ -231,7 +230,7 @@
             NSInteger endPos = [textView offsetFromPosition:beginning toPosition:end];
             NSInteger length = endPos - startPos;
             
-            return [NSDictionary dictionaryWithObjectsAndKeys:NUMINTEGER(startPos),@"location",NUMINTEGER(length),@"length",nil];
+            return [NSDictionary dictionaryWithObjectsAndKeys:NUMINT(startPos),@"location",NUMINT(length),@"length",nil];
         }
     }
     return nil;

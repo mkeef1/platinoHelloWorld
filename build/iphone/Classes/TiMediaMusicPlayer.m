@@ -211,25 +211,12 @@
 
 -(NSNumber*)volume
 {
-    __block float volume = 1.0;
-    if (player != nil) {
-        TiThreadPerformOnMainThread(^{
-            volume = [TiUtils volumeFromObject:player default:volume];
-        }, YES);
-    }
-    
-    return NUMFLOAT(volume);
+	return NUMFLOAT([player volume]);
 }
 
 -(void)setVolume:(NSNumber*)vol
 {
-    float volume = [TiUtils floatValue:vol def:-1];
-    volume = MAX(0.0, MIN(volume, 1.0));
-    if (player != nil) {
-        TiThreadPerformOnMainThread(^{
-            [TiUtils setVolume:volume onObject:player];
-        }, NO);
-    }
+	[player setVolume:[vol floatValue]];
 }
 
 #pragma mark Notifications

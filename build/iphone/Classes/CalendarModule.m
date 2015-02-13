@@ -68,7 +68,7 @@ typedef void(^EKEventStoreRequestAccessCompletionHandler)(BOOL granted, NSError 
         return nil;
         
     }
-    return [ourStore calendarsForEntityType:EKEntityTypeEvent];
+    return [ourStore calendars];
 }
 
 -(NSString*)apiName
@@ -80,6 +80,9 @@ typedef void(^EKEventStoreRequestAccessCompletionHandler)(BOOL granted, NSError 
 {
     [super startup];
     store = NULL;
+    if ([EKEventStore respondsToSelector:@selector(authorizationStatusForEntityType:)]) {
+         iOS6API = YES;
+    }
 }
 
 -(void) eventStoreChanged:(NSNotification*)notification
@@ -194,38 +197,41 @@ typedef void(^EKEventStoreRequestAccessCompletionHandler)(BOOL granted, NSError 
 -(void) requestAuthorization:(id)args forEntityType:(EKEntityType)entityType
 {
     ENSURE_SINGLE_ARG(args, KrollCallback);
-    KrollCallback * callback = args;
-    NSString * errorStr = nil;
-    int code = 0;
-    BOOL doPrompt = NO;
+	KrollCallback * callback = args;
+	NSString * errorStr = nil;
+	int code = 0;
+	bool doPrompt = NO;
     
-    long int permissions = [EKEventStore authorizationStatusForEntityType:entityType];
-    switch (permissions) {
-        case EKAuthorizationStatusNotDetermined:
-            doPrompt = YES;
-            break;
-        case EKAuthorizationStatusAuthorized:
-            break;
-        case EKAuthorizationStatusDenied:
-            code = EKAuthorizationStatusDenied;
-            errorStr = @"The user has denied access to events in Calendar.";
-			break;
-        case EKAuthorizationStatusRestricted:
-            code = EKAuthorizationStatusRestricted;
-            errorStr = @"The user is unable to allow access to events in Calendar.";
-        default:
-            break;
-    }
-	
-    if (!doPrompt) {
-        NSDictionary * propertiesDict = [TiUtils dictionaryWithCode:code message:errorStr];
-        NSArray * invocationArray = [[NSArray alloc] initWithObjects:&propertiesDict count:1];
+    
+    if (iOS6API) {
         
-        [callback call:invocationArray thisObject:self];
-        [invocationArray release];
-        return;
-    }
-    TiThreadPerformOnMainThread(^(){
+        long int permissions = [EKEventStore authorizationStatusForEntityType:entityType];
+		switch (permissions) {
+			case EKAuthorizationStatusNotDetermined:
+				doPrompt = YES;
+				break;
+			case EKAuthorizationStatusAuthorized:
+				break;
+			case EKAuthorizationStatusDenied:
+				code = EKAuthorizationStatusDenied;
+				errorStr = @"The user has denied access to events in Calendar.";
+			case EKAuthorizationStatusRestricted:
+				code = EKAuthorizationStatusRestricted;
+				errorStr = @"The user is unable to allow access to events in Calendar.";
+			default:
+				break;
+		}
+	}
+    
+	if (!doPrompt) {
+		NSDictionary * propertiesDict = [TiUtils dictionaryWithCode:code message:errorStr];
+		NSArray * invocationArray = [[NSArray alloc] initWithObjects:&propertiesDict count:1];
+        
+		[callback call:invocationArray thisObject:self];
+		[invocationArray release];
+		return;
+	}
+	TiThreadPerformOnMainThread(^(){
 		
         EKEventStore* ourstore = [self store];
         [ourstore requestAccessToEntityType:EKEntityTypeEvent
@@ -239,9 +245,8 @@ typedef void(^EKEventStoreRequestAccessCompletionHandler)(BOOL granted, NSError 
                                      }
                                      KrollEvent * invocationEvent = [[KrollEvent alloc] initWithCallback:callback eventObject:propertiesDict thisObject:self];
                                      [[callback context] enqueue:invocationEvent];
-									 RELEASE_TO_NIL(invocationEvent);
                                  }];
-    }, NO);
+	}, NO);
 }
 
 #pragma mark - Public API
@@ -260,8 +265,11 @@ typedef void(^EKEventStoreRequestAccessCompletionHandler)(BOOL granted, NSError 
 
 -(NSNumber*) eventsAuthorization
 {
-    EKAuthorizationStatus result = [EKEventStore authorizationStatusForEntityType:EKEntityTypeEvent];
-    return [NSNumber numberWithInteger:result];
+    long int result = EKAuthorizationStatusAuthorized;
+    if (iOS6API) { //in iOS 5.1 and below: no need to check for authorization.
+        result = [EKEventStore authorizationStatusForEntityType:EKEntityTypeEvent];
+    }
+    return [NSNumber numberWithLong:result];
 }
 #pragma mark - Properties
 

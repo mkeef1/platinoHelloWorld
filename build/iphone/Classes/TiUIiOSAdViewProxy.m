@@ -19,22 +19,18 @@
 
 +(NSString*)portraitSize
 {
-    DebugLog(@"[WARN] Property portraitSize has been deprecated since 3.4.2 and no longer represents a valid value.");
-    if ([TiUtils isIPad]) {
-        return NSStringFromCGSize(CGSizeMake(768, 66));
-    } else {
-        return NSStringFromCGSize(CGSizeMake(320, 50));
-    }
+	if ([TiUtils isIOS4_2OrGreater]) {
+		return ADBannerContentSizeIdentifierPortrait;
+	}
+	return @"ADBannerContentSize320x50";
 }
 
 +(NSString*)landscapeSize
 {
-    DebugLog(@"[WARN] Property landscapeSize has been deprecated since 3.4.2 and no longer represents a valid value.");
-    if ([TiUtils isIPad]) {
-        return NSStringFromCGSize(CGSizeMake(1024, 66));
-    } else {
-        return NSStringFromCGSize(CGSizeMake(480, 32));
-    }
+	if ([TiUtils isIOS4_2OrGreater]) {
+		return ADBannerContentSizeIdentifierLandscape;
+	}
+	return @"ADBannerContentSize480x32";
 }
 
 -(NSString*)apiName
@@ -51,18 +47,6 @@
     return TiDimensionAutoSize;
 }
 
--(CGFloat) verifyWidth:(CGFloat)suggestedWidth
-{
-    int width = MAX(suggestedWidth,[(TiUIiOSAdView*)[self view] contentWidthForWidth:suggestedWidth]);
-    return width;
-}
-
--(CGFloat) verifyHeight:(CGFloat)suggestedHeight
-{
-    int height = MAX(suggestedHeight,[(TiUIiOSAdView*)[self view] contentHeightForWidth:suggestedHeight]);
-    return height;
-}
-
 USE_VIEW_FOR_CONTENT_HEIGHT
 USE_VIEW_FOR_CONTENT_WIDTH
 
@@ -74,28 +58,36 @@ USE_VIEW_FOR_CONTENT_WIDTH
 
 -(NSString*)adSize
 {
-     DebugLog(@"[WARN] Property adSize has been deprecated since 3.4.2 and no longer represents a constant value.");
     __block NSString* adSize;
     
     TiThreadPerformOnMainThread(^{
-        CGRect bounds = [[(TiUIiOSAdView*)[self view] adview] bounds];
-        adSize = [NSStringFromCGSize(bounds.size) retain];
+        adSize = [[(TiUIiOSAdView*)[self view] adview] currentContentSizeIdentifier];
     }, YES);
     
-    return [adSize autorelease];
+    return adSize;
 }
 
 -(void)setAdSize:(id)arg
 {
-    DebugLog(@"[WARN] Property adSize has been deprecated since 3.4.2 and no longer represents a valid value.");
+	ENSURE_SINGLE_ARG(arg,NSString);
+    
+    // Sanity check values
+    if (!([arg isEqualToString:[TiUIiOSAdViewProxy portraitSize]] || [arg isEqualToString:[TiUIiOSAdViewProxy landscapeSize]])) {
+        [self throwException:@"TiInvalidArg" 
+                   subreason:@"Invalid value for Ti.UI.iOS.AdView.adSize"
+                    location:CODELOCATION];
+    }
+    
+    // Need to ensure the size is set on the UI thread
+    [self makeViewPerformSelector:@selector(setAdSize:) withObject:arg createIfNeeded:YES waitUntilDone:NO];
 }
 
 -(void)fireLoad:(id)unused
 {
-    if ([self _hasListeners:@"load" checkParent:NO])
+    if ([self _hasListeners:@"load"])
     {
         NSMutableDictionary *event = [NSMutableDictionary dictionary];
-        [self fireEvent:@"load" withObject:event withSource:self propagate:NO reportSuccess:NO errorCode:0 message:nil];
+        [self fireEvent:@"load" withObject:event];
     }
 
     [self contentsWillChange];

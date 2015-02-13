@@ -140,7 +140,7 @@ properties the same as foo.item(index).
 
 -(NSNumber*)length
 {
-	return NUMUINTEGER([[(GDataXMLElement*)[element node] attributes] count]);
+	return NUMINT([[(GDataXMLElement*)[element node] attributes] count]);
 }
 
 @end

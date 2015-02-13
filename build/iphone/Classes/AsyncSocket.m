@@ -1423,11 +1423,9 @@ static void MyCFWriteStreamCallback(CFWriteStreamRef stream, CFStreamEventType t
 		// However, the kernel will choose a different port for both theSocket4 and theSocket6
 		// So we grab the port the kernel choose for theSocket4, and set it as the port for theSocket6
 		UInt16 chosenPort = [self localPortFromCFSocket4:theSocket4];
-		if (address6) {
-			struct sockaddr_in6 *pSockAddr6 = (struct sockaddr_in6 *)[address6 bytes];
-			pSockAddr6->sin6_port = htons(chosenPort);
-		}
-
+		
+		struct sockaddr_in6 *pSockAddr6 = (struct sockaddr_in6 *)[address6 bytes];
+		pSockAddr6->sin6_port = htons(chosenPort);
     }
 	
 	if (theSocket6)

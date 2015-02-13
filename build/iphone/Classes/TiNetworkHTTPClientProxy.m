@@ -195,7 +195,7 @@ extern NSString * const TI_APPLICATION_GUID;
                         extension = [Mimetypes extensionForMimeType:mime];
                     }
                     if (name == nil) {
-                        name = [NSString stringWithFormat:@"%li%li", (long)dataIndex++, (long)timestamp];
+                        name = [NSString stringWithFormat:@"%i%i", dataIndex++, timestamp];
                         if (extension != nil) {
                             name = [NSString stringWithFormat:@"%@.%@", name, extension];
                         }
@@ -285,12 +285,7 @@ extern NSString * const TI_APPLICATION_GUID;
         if(_downloadTime == 0 || diff > TI_HTTP_REQUEST_PROGRESS_INTERVAL || [response readyState] == APSHTTPResponseStateDone) {
             _downloadTime = 0;
             NSDictionary *eventDict = [NSMutableDictionary dictionary];
-            float downloadProgress = [response downloadProgress];
-            // return progress as -1 if it is outside the valid range
-            if (downloadProgress > 1 || downloadProgress < 0) {
-                downloadProgress = -1.0f;
-            }
-            [eventDict setValue:[NSNumber numberWithFloat: downloadProgress] forKey:@"progress"];
+            [eventDict setValue:[NSNumber numberWithFloat: [response downloadProgress]] forKey:@"progress"];
             [self fireCallback:@"ondatastream" withArg:eventDict withSource:self];
         }
         if(_downloadTime == 0) {
@@ -322,7 +317,7 @@ extern NSString * const TI_APPLICATION_GUID;
     if([request cancelled]) {
         return;
     }
-    NSInteger responseCode = [response status];
+    int responseCode = [response status];
     /**
      *    Per customer request, successful communications that resulted in an
      *    4xx or 5xx response is treated as an error instead of an onload.
@@ -362,7 +357,7 @@ extern NSString * const TI_APPLICATION_GUID;
 -(void)request:(APSHTTPRequest *)request onReadyStateChange:(APSHTTPResponse *)response
 {
     if(hasOnreadystatechange) {
-        [self fireCallback:@"onreadystatechange" withArg:[NSDictionary dictionaryWithObjectsAndKeys:NUMINT(response.readyState),@"readyState", nil] withSource:self];
+        [self fireCallback:@"onreadystatechange" withArg:nil withSource:self];
     }
 }
 
@@ -453,7 +448,7 @@ extern NSString * const TI_APPLICATION_GUID;
 
 -(NSNumber*)status
 {
-    return NUMINTEGER([[self response] status]);
+    return NUMINT([[self response] status]);
 }
 
 -(NSString*)statusText

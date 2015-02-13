@@ -828,6 +828,7 @@ DEFINE_EXCEPTIONS
 {
 	[[TiApp app] stopNetwork];
 	ImageLoaderRequest *req = [[request userInfo] objectForKey:@"request"];
+	NSError *error = [response error];
     
 	if ([request cancelled]) {
         if ([[req delegate] respondsToSelector:@selector(imageLoadCancelled:)]) {

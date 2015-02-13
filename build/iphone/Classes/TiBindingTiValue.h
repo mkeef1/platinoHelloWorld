@@ -7,7 +7,7 @@
  * WARNING: This is generated code. Modify at your own risk and without support.
  */
 #import <Foundation/Foundation.h>
-#import "JavaScriptCore/TiCore.h"
+#import "TiCore.h"
 #import "TiBase.h"
 
 @class TiProxy;

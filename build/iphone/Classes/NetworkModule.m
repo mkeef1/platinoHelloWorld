@@ -212,8 +212,6 @@ MAKE_SYSTEM_PROP(TLS_VERSION_1_0, TLS_VERSION_1_0);
 MAKE_SYSTEM_PROP(TLS_VERSION_1_1, TLS_VERSION_1_1);
 MAKE_SYSTEM_PROP(TLS_VERSION_1_2, TLS_VERSION_1_2);
 
-MAKE_SYSTEM_NUMBER(PROGRESS_UNKNOWN, NUMINT(-1));
-
 #pragma mark Push Notifications 
 
 - (NSString*) remoteDeviceUUID
@@ -449,7 +447,6 @@ MAKE_SYSTEM_NUMBER(PROGRESS_UNKNOWN, NUMINT(-1));
     {
         [storage setCookie:cookie];
     }
-	RELEASE_TO_NIL(cookie);
 }
 
 -(NSArray*)getHTTPCookies:(id)args
@@ -464,14 +461,13 @@ MAKE_SYSTEM_NUMBER(PROGRESS_UNKNOWN, NUMINT(-1));
     
     NSArray *allCookies = [storage cookies];
     NSMutableArray *returnArray = [NSMutableArray array];
+    NSHTTPCookie *c = [[NSHTTPCookie alloc] initWithProperties:@{}];
     for(NSHTTPCookie *cookie in allCookies)
     {
         if([[cookie domain] isEqualToString:domain] &&
            [[cookie path] isEqualToString:path] &&
            ([[cookie name] isEqualToString:name] || name == nil)) {
-			TiNetworkCookieProxy *tempCookieProxy = [[TiNetworkCookieProxy alloc] initWithCookie:cookie andPageContext:[self evaluationContext]];
-            [returnArray addObject:tempCookieProxy];
-			RELEASE_TO_NIL(tempCookieProxy);
+            [returnArray addObject:[[[TiNetworkCookieProxy alloc] initWithCookie:cookie andPageContext:[self evaluationContext]] autorelease]];
         }
     }
     return returnArray;
@@ -490,9 +486,7 @@ MAKE_SYSTEM_NUMBER(PROGRESS_UNKNOWN, NUMINT(-1));
     NSArray* cookies = [self getHTTPCookies:args];
     NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for(TiNetworkCookieProxy* cookie in cookies) {
-		NSHTTPCookie *tempCookie = [cookie newCookie];
-        [storage deleteCookie: tempCookie];
-		RELEASE_TO_NIL(tempCookie);
+        [storage deleteCookie: [cookie newCookie]];
     }
 }
 
@@ -501,9 +495,7 @@ MAKE_SYSTEM_NUMBER(PROGRESS_UNKNOWN, NUMINT(-1));
     NSArray* cookies = [self getHTTPCookiesForDomain:args];
     NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for(TiNetworkCookieProxy* cookie in cookies) {
-		NSHTTPCookie *tempCookie = [cookie newCookie];
-        [storage deleteCookie: tempCookie];
-		RELEASE_TO_NIL(tempCookie);
+        [storage deleteCookie: [cookie newCookie]];
     }
 }
 

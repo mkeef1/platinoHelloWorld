@@ -244,7 +244,7 @@ self.p = v;\
 
 -(id)description
 {
-	return [NSString stringWithFormat:@"[object TiAnimation<%lu>]",(unsigned long)[self hash]];
+	return [NSString stringWithFormat:@"[object TiAnimation<%d>]",[self hash]];
 }
 
 -(void)animationStarted:(NSString *)animationID context:(void *)context
@@ -278,6 +278,7 @@ self.p = v;\
 	
 	TiAnimation* animation = (TiAnimation*)context;
     if ([animation isReverse]) {
+        RELEASE_TO_NIL(animation.animatedView);
         
         animation = [animation reverseAnimation]; // Use the original animation for correct eventing
         //Make sure we have the animatedViewProxy so we can correctly signal end of animation
@@ -315,7 +316,7 @@ self.p = v;\
 	}	
 	
     RELEASE_TO_NIL(animatedViewProxy);
-    RELEASE_TO_NIL_AUTORELEASE(animatedView);
+	RELEASE_TO_NIL(animation.animatedView);
 }
 
 -(BOOL)isTransitionAnimation
@@ -696,9 +697,7 @@ doReposition = YES;\
                                 [parentProxy add:child];
                             }
              ];
-        } else {
-            RELEASE_TO_NIL_AUTORELEASE(animatedView);
-        }
+		}
 	}
 
 	

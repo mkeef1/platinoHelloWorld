@@ -13,7 +13,7 @@
 
 #ifdef USE_TI_UIIOSADVIEW
 
-extern BOOL const TI_APPLICATION_ANALYTICS;
+extern NSString * const TI_APPLICATION_ANALYTICS;
 
 @implementation TiUIiOSAdView
 
@@ -27,7 +27,8 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
 {
 	if (adview == nil)
 	{
-		adview = [[ADBannerView alloc] initWithAdType:ADAdTypeBanner];
+		adview = [[ADBannerView alloc] initWithFrame:CGRectZero];
+		adview.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		adview.delegate = self;
 		[self addSubview:adview];
 	}
@@ -41,18 +42,16 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
 
 -(CGFloat)contentHeightForWidth:(CGFloat)value
 {
-    ADBannerView *view = [self adview];
-    CGSize refSize = [[UIScreen mainScreen] bounds].size;
-    CGSize size = [view sizeThatFits:refSize];
-    return size.height;
+	ADBannerView *view = [self adview];
+	CGSize size = [ADBannerView sizeFromBannerContentSizeIdentifier:view.currentContentSizeIdentifier];
+	return size.height;
 }
 
 -(CGFloat)contentWidthForWidth:(CGFloat)value
 {
-    ADBannerView *view = [self adview];
-    CGSize refSize = [[UIScreen mainScreen] bounds].size;
-    CGSize size = [view sizeThatFits:refSize];
-    return size.width;
+	ADBannerView *view = [self adview];
+	CGSize size = [ADBannerView sizeFromBannerContentSizeIdentifier:view.currentContentSizeIdentifier];
+	return size.width;
 }
 
 -(void)frameSizeChanged:(CGRect)frame bounds:(CGRect)bounds
@@ -62,6 +61,11 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
 		[TiUtils setView:[self adview] positionRect:bounds];
 	}
     [super frameSizeChanged:frame bounds:bounds];
+}
+
+-(void)setAdSize:(NSString*)sizeName
+{
+    [self adview].currentContentSizeIdentifier = sizeName;
 }
 
 #pragma mark Public APIs
@@ -81,7 +85,7 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
     [self.proxy replaceValue:NUMBOOL(YES) forKey:@"visible" notification:YES];
 	if (TI_APPLICATION_ANALYTICS)
 	{
-		NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:NSStringFromCGSize(banner.bounds.size),@"size",nil];
+		NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:[banner currentContentSizeIdentifier],@"size",nil];
         APSAnalytics *sharedAnalytics = [APSAnalytics sharedInstance];
         SEL aSelector = NSSelectorFromString(@"sendCustomEvent:withEventType:payload:");
         if([sharedAnalytics respondsToSelector:aSelector]) {
@@ -102,7 +106,7 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
 {
 	if (TI_APPLICATION_ANALYTICS)
 	{
-		NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:NSStringFromCGSize(banner.bounds.size),@"size",nil];
+		NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:[banner currentContentSizeIdentifier],@"size",nil];
         APSAnalytics *sharedAnalytics = [APSAnalytics sharedInstance];
         SEL aSelector = NSSelectorFromString(@"sendCustomEvent:withEventType:payload:");
         if([sharedAnalytics respondsToSelector:aSelector]) {
@@ -117,10 +121,10 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
         }
 
 	}
-	if ([(TiViewProxy*)self.proxy _hasListeners:@"action" checkParent:NO])
+	if ([self.proxy _hasListeners:@"action"])
 	{
 		NSMutableDictionary *event = [NSMutableDictionary dictionary];
-		[self.proxy fireEvent:@"action" withObject:event withSource:self propagate:NO reportSuccess:NO errorCode:0 message:nil];
+		[self.proxy fireEvent:@"action" withObject:event];
 	}
 }
 
@@ -131,15 +135,15 @@ extern BOOL const TI_APPLICATION_ANALYTICS;
 
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {
-	TiViewProxy * selfProxy = (TiViewProxy*)[self proxy];
+	TiProxy * selfProxy = [self proxy];
 	// per Apple, we must hide the banner view if there's no ad
 	[selfProxy replaceValue:NUMBOOL(NO) forKey:@"visible" notification:YES];
 	
-	if ([selfProxy _hasListeners:@"error" checkParent:NO])
+	if ([selfProxy _hasListeners:@"error"])
 	{
 		NSString * message = [TiUtils messageFromError:error];
 		NSDictionary *event = [NSDictionary dictionaryWithObject:message forKey:@"message"];
-		[selfProxy fireEvent:@"error" withObject:event propagate:NO reportSuccess:YES errorCode:[error code] message:message];
+		[selfProxy fireEvent:@"error" withObject:event errorCode:[error code] message:message];
 	}
 }
 

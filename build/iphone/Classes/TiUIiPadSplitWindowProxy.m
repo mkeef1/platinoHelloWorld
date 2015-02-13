@@ -141,7 +141,7 @@
 -(BOOL)_handleClose:(id)args
 {
     // Ensure popup isn't visible so it can be dealloced
-	[(TiUIiPadSplitWindow*)[self view] setMasterPopupVisible_:NUMBOOL(NO)];
+	[(TiUIiPadSplitWindow*)[self view] setMasterPopupVisible_:NO];
     
     return [super _handleClose:args];
 }

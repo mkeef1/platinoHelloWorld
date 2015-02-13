@@ -49,19 +49,17 @@
 
 -(CGSize)sizeForFont:(CGFloat)suggestedWidth
 {
-	NSAttributedString *value = [label attributedText];
+	NSString *value = [label text];
+	UIFont *font = [label font];
 	CGSize maxSize = CGSizeMake(suggestedWidth<=0 ? 480 : suggestedWidth, 10000);
 	CGSize shadowOffset = [label shadowOffset];
 	requiresLayout = YES;
-	if ((suggestedWidth > 0) && [[label text] hasSuffix:@" "]) {
+	if ((suggestedWidth > 0) && [value hasSuffix:@" "]) {
 		// (CGSize)sizeWithFont:(UIFont *)font constrainedToSize:(CGSize)size lineBreakMode:(UILineBreakMode)lineBreakMode method truncates
 		// the string having trailing spaces when given size parameter width is equal to the expected return width, so we adjust it here.
 		maxSize.width += 0.00001;
 	}
-    CGSize returnVal = [value boundingRectWithSize:maxSize
-                                           options:NSStringDrawingUsesLineFragmentOrigin
-                                           context:nil].size;
-    CGSize size = CGSizeMake(ceilf(returnVal.width), ceilf(returnVal.height));
+	CGSize size = [value sizeWithFont:font constrainedToSize:maxSize lineBreakMode:UILineBreakModeTailTruncation];
 	if (shadowOffset.width > 0)
 	{
 		// if we have a shadow and auto, we need to adjust to prevent
@@ -105,10 +103,10 @@
     if (alignment != UIControlContentVerticalAlignmentFill && ([label numberOfLines] != 1)) {
         CGFloat originX = 0;
         switch (label.textAlignment) {
-            case NSTextAlignmentRight:
+            case UITextAlignmentRight:
                 originX = (initialLabelFrame.size.width - actualLabelSize.width);
                 break;
-            case NSTextAlignmentCenter:
+            case UITextAlignmentCenter:
                 originX = (initialLabelFrame.size.width - actualLabelSize.width)/2.0;
                 break;
             default:
@@ -177,7 +175,6 @@
         wrapperView.clipsToBounds = YES;
         [wrapperView setUserInteractionEnabled:NO];
         [self addSubview:wrapperView];
-        minFontSize = 0;
     }
 	return label;
 }
@@ -294,7 +291,7 @@
         if(url != nil && url.length) {
             NSDictionary *eventDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                        url, @"url",
-                                       [NSArray arrayWithObjects:NUMUINTEGER(theRange.location), NUMUINTEGER(theRange.length),nil],@"range",
+                                       [NSArray arrayWithObjects:NUMINT(theRange.location), NUMINT(theRange.length),nil],@"range",
                                        nil];
                                             
             [[self proxy] fireEvent:@"link" withObject:eventDict propagate:NO reportSuccess:NO errorCode:0 message:nil];
@@ -327,19 +324,17 @@
                         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
                         [paragraphStyle setLineBreakMode:label.lineBreakMode];
                         [optimizedAttributedText addAttribute:(NSString*)kCTParagraphStyleAttributeName value:paragraphStyle range:range];
-						RELEASE_TO_NIL(paragraphStyle);
                     }
                 }];
                 
                 // modify kCTLineBreakByTruncatingTail lineBreakMode to kCTLineBreakByWordWrapping
                 [optimizedAttributedText enumerateAttribute:(NSString*)kCTParagraphStyleAttributeName inRange:NSMakeRange(0, [optimizedAttributedText length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
                     NSMutableParagraphStyle* paragraphStyle = [value mutableCopy];
-                    if ([paragraphStyle lineBreakMode] == NSLineBreakByTruncatingTail) {
-                        [paragraphStyle setLineBreakMode:NSLineBreakByWordWrapping];
+                    if ([paragraphStyle lineBreakMode] == kCTLineBreakByTruncatingTail) {
+                        [paragraphStyle setLineBreakMode:kCTLineBreakByWordWrapping];
                     }
                     [optimizedAttributedText removeAttribute:(NSString*)kCTParagraphStyleAttributeName range:range];
                     [optimizedAttributedText addAttribute:(NSString*)kCTParagraphStyleAttributeName value:paragraphStyle range:range];
-					RELEASE_TO_NIL(paragraphStyle);
                 }];
                 [self checkLinkAttributeForString:optimizedAttributedText atPoint:p];
                 [optimizedAttributedText release];
@@ -417,27 +412,22 @@
 
 -(void)setFont_:(id)font
 {
-    [[self label] setFont:[[TiUtils fontValue:font] font]];
-    if (minFontSize > 4) {
-        CGFloat ratio = minFontSize/label.font.pointSize;
-        [label setMinimumScaleFactor:ratio];
-    }
-    [(TiViewProxy *)[self proxy] contentsWillChange];
+	[[self label] setFont:[[TiUtils fontValue:font] font]];
+	[(TiViewProxy *)[self proxy] contentsWillChange];
 }
 
 -(void)setMinimumFontSize_:(id)size
 {
-    minFontSize = [TiUtils floatValue:size];
-    if (minFontSize < 4) { // Beholden to 'most minimum' font size
+    CGFloat newSize = [TiUtils floatValue:size];
+    if (newSize < 4) { // Beholden to 'most minimum' font size
         [[self label] setAdjustsFontSizeToFitWidth:NO];
-        [label setMinimumScaleFactor:0.0];
-        [label setNumberOfLines:0];
+        [[self label] setMinimumFontSize:0.0];
+        [[self label] setNumberOfLines:0];
     }
     else {
         [[self label] setNumberOfLines:1];
-        [label setAdjustsFontSizeToFitWidth:YES];
-        CGFloat ratio = minFontSize/label.font.pointSize;
-        [label setMinimumScaleFactor:ratio];
+        [[self label] setAdjustsFontSizeToFitWidth:YES];
+        [[self label] setMinimumFontSize:newSize];
     }
 
 }

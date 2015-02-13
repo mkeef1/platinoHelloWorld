@@ -2145,7 +2145,6 @@ static void MyCFSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, con
 								// The user connected to an address, and the received data doesn't match the address.
 								// This may happen if the data is received by the kernel prior to the connect call.
 								appIgnoredReceivedData = YES;
-								free(buf);
 							}
 							else
 							{
@@ -2159,9 +2158,6 @@ static void MyCFSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, con
 								theCurrentReceive->host = [host retain];
 								theCurrentReceive->port = port;
 							}
-						}
-						else {
-							free(buf);
 						}
 						
 						theFlags &= ~kSock4HasBytesAvailable;
@@ -2183,7 +2179,6 @@ static void MyCFSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, con
 								// The user connected to an address, and the received data doesn't match the address.
 								// This may happen if the data is received by the kernel prior to the connect call.
 								appIgnoredReceivedData = YES;
-								free(buf);
 							}
 							else
 							{
@@ -2198,13 +2193,14 @@ static void MyCFSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, con
 								theCurrentReceive->port = port;
 							}
 						}
-						else {
-							free(buf);
-						}
 						theFlags &= ~kSock6HasBytesAvailable;
-						
 					}
-
+					// Check to see if we need to free our alloc'd buffer
+					// If the buffer is non-nil, this means it has taken ownership of the buffer
+					if(theCurrentReceive->buffer == nil)
+					{
+						free(buf);
+					}
 				}
 				
 				if(result < 0)

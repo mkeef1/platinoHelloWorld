@@ -9,7 +9,8 @@
 #import "TiUIView.h"
 
 @interface TiUIButtonBar : TiUIView<LayoutAutosizing> {
-	NSInteger selectedIndex;
+	int selectedIndex;
+	BOOL isNullStyle;
 	BOOL controlSpecifiedWidth;
 	UISegmentedControl * segmentedControl;
 }
