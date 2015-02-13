@@ -1,0 +1,7 @@
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/android/support/v7/appcompat/R.java"
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/com/mkeef1/intro/ApplicationStylesheet.java"
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/com/mkeef1/intro/IntroActivity.java"
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/com/mkeef1/intro/IntroAppInfo.java"
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/com/mkeef1/intro/IntroApplication.java"
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/com/mkeef1/intro/R.java"
+"/Users/matt/Documents/Code/Titanium/intro/build/android/gen/ti/modules/titanium/ui/R.java"
